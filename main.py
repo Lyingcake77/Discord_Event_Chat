@@ -1,4 +1,4 @@
-# eventchat.py
+# main.py
 import os
 import discord
 from dotenv import load_dotenv
@@ -7,8 +7,8 @@ from datetime import datetime
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 EventChannelId = os.getenv('EVENT_CHANNEL_ID')
-WelcomeText = "Welcome to the automatically generated thread. you've been added becausd you are interested in this event. this thread will be deleted once you are not interested in the event."
-ReminderText = "Event has begun, please remember that this chat will close once the event finishes."
+WelcomeText = "Welcome to an automatically generated private thread. You've been added because you are interested in this event. This thread will be deleted once you are not interested in the event or once it Ends."
+ReminderText = "Event has begun, please remember that this chat will be deleted once the event finishes."
 # This example requires the 'message_content' intent.
 
 class MyClient(discord.Client):
