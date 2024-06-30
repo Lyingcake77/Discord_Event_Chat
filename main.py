@@ -92,26 +92,25 @@ class MyClient(discord.Client):
         if thread != None:
             await thread.remove_user(user)
     async def on_raw_reaction_add(client, payload):
-        if(payload.messageId == RoleManagerMessageId  ): #and  payload.userId != self.userId shouldnt happen. bots have no emtions and therefore cannot react 
-            roleName = reaction_to_role_converter(payload.emoji)          
-            #get role based on emoji
-            #get member? and check if member has role already
-            #if no then add role
+        if(str(payload.message_id) == str(RoleManagerMessageId)): #and  payload.userId != self.userId shouldnt happen. bots have no emtions and therefore cannot react             
+            roleName = reaction_to_role_converter(payload.emoji.name)                   
             if(roleName != ""):
+                guild = get_guild(client, payload.guild_id)
                 #get role
-                role = discord.utils.get(get_guild(client, payload.guild_id).fetch_roles(), name=roleName)
+                role = discord.utils.get(await guild.fetch_roles(), name=roleName)
                 #get member? or User? but not in the reaction removal?
                 member = payload.member
-                if(not member_has_role(member, role)):
+                if(role != None and not member_has_role(member, role)):
                     await member.add_roles(role)
 
     async def on_raw_reaction_remove(client, payload):
-        if(payload.messageId == RoleManagerMessageId):
-            roleName = reaction_to_role_converter(payload.emoji)
-            if(roleName != ""):
-                role = discord.utils.get(get_guild(client, payload.guild_id).fetch_roles(), name=roleName)
+        if(str(payload.message_id) == str(RoleManagerMessageId)):
+            roleName = reaction_to_role_converter(payload.emoji.name)
+            if(roleName != ""):              
+                guild = get_guild(client, payload.guild_id)
+                role = discord.utils.get(await guild.fetch_roles(), name=roleName)
                 member = discord.utils.get(client.get_all_members(), id=payload.user_id)
-                if(member_has_role(member, role)):
+                if(role != None and member_has_role(member, role)):
                     await member.remove_roles(role)
                     
                     
@@ -119,14 +118,22 @@ def get_guild(client, guild_id):
     return discord.utils.get(client.guilds, id=guild_id)
 def reaction_to_role_converter(emoji):
     roleName = ""
-    if(emoji == ":climbnasium:"):
+    if(emoji == "climbnasium"):
         roleName = "Climbnasium"
-    elif(emoji == ":mountain:"):
-        roleName = "Outdoor"
-    elif(emoji == ":person_climbing:"):
+    elif(emoji == "🧗"):
         roleName = "Events"
-    elif(emoji == ":muscle:"):
+    elif(emoji == "⛰️"):
+        roleName = "Outdoor"
+    elif(emoji == "🛋️'"):
+        roleName = "Indoor"
+    elif(emoji == "💪"):
         roleName = "Training"
+    elif(emoji == "🥐"):
+        roleName = "Food"
+    elif(emoji == "📸"):
+        roleName = "Photos"
+    elif(emoji == "🐢"):
+        roleName = "Tims Taffy"
     return roleName
 def member_has_role(member, role):
     return False if (member.get_role(role.id) == None) else True
@@ -136,6 +143,5 @@ def get_channel_thread(channel, event):
     
 intents = discord.Intents.all()
 intents.message_content = True
-
 client = MyClient(intents=intents)
 client.run(TOKEN)
